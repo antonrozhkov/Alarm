@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+        <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black"/>
+
+        <TextView
+                android:id="@+id/time"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="10:20"
+                android:textSize="20sp"
+                android:padding="10dp"/>
+
+        <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black"/>
+
+        <CheckBox
+                android:id="@+id/monday"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/monday"/>
+
+        <CheckBox
+                android:id="@+id/tuesday"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/tuesday"/>
+
+        <CheckBox
+                android:id="@+id/wednesday"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/wednesday"/>
+
+        <CheckBox
+                android:id="@+id/thursday"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/thursday"/>
+
+        <CheckBox
+                android:id="@+id/friday"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/friday"/>
+
+        <CheckBox
+                android:id="@+id/saturday"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/saturday"/>
+
+        <CheckBox
+                android:id="@+id/sunday"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sunday"/>
+
+        <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black"/>
+
+        <TextView
+                android:id="@+id/music"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/select_music"
+                android:textSize="20sp"
+                android:padding="10dp"/>
+
+        <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black"/>
+
+        <Button
+                android:id="@+id/ok"
+                android:layout_width="90dp"
+                android:layout_height="48dp"
+                android:text="OK"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"/>
+
+    </LinearLayout>
+</ScrollView>

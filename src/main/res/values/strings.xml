@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">Alarm</string>
+    <string name="widget_name">Будильник</string>
+
+    <string name="monday">Понедельник</string>
+    <string name="tuesday">Вторник</string>
+    <string name="wednesday">Среда</string>
+    <string name="thursday">Четверг</string>
+    <string name="friday">Пятница</string>
+    <string name="saturday">Суббота</string>
+    <string name="sunday">Воскресенье</string>
+
+    <string name="monday_alias">П</string>
+    <string name="tuesday_alias">В</string>
+    <string name="wednesday_alias">С</string>
+    <string name="thursday_alias">Ч</string>
+    <string name="friday_alias">П</string>
+    <string name="saturday_alias">С</string>
+    <string name="sunday_alias">В</string>
+
+    <string name="wake_message">РОТАПОДЪЁМ!!!</string>
+    <string name="select_music">Выберете музыку</string>
+
+    <string-array name="days_array">
+        <item>monday</item>
+        <item>tuesday</item>
+        <item>wednesday</item>
+        <item>thursday</item>
+        <item>friday</item>
+        <item>saturday</item>
+        <item>sunday</item>
+    </string-array>
+
+</resources>
