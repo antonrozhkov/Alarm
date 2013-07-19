@@ -5,16 +5,14 @@ import android.content.SharedPreferences;
 
 import com.aurozhkov.alarm.R;
 import com.aurozhkov.alarm.beans.AlarmDays;
+import com.aurozhkov.alarm.beans.AlarmMusic;
 import com.aurozhkov.alarm.beans.AlarmTime;
 
 import java.util.BitSet;
 
 public class AlarmStorageUtils {
 
-    private static final String DAY = "day";
-    private static final String TIME = "time";
     private static final String ON = "on";
-    private static final String MUSIC = "music";
     private final static String PREF = "pref";
 
     public static AlarmDays getAlarmDays(Context context) {
@@ -36,7 +34,7 @@ public class AlarmStorageUtils {
         return alarmTime;
     }
 
-    public static void setAlarmTime(Context context, AlarmTime time) {
+    public static void saveAlarmTime(Context context, AlarmTime time) {
         final SharedPreferences sp = getSharedPreferences(context);
         time.saveToSharedPreferences(sp);
     }
@@ -46,24 +44,23 @@ public class AlarmStorageUtils {
         return sp.getBoolean(ON, false);
     }
 
-    public static void setAlarmOn(Context context, boolean on) {
+    public static void saveAlarmOn(Context context, boolean on) {
         final SharedPreferences sp = getSharedPreferences(context);
         final SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean(ON, on);
         editor.commit();
     }
 
-
-    public static long getAlarmMusicId(Context context) {
+    public static AlarmMusic getAlarmMusic(Context context) {
         final SharedPreferences sp = getSharedPreferences(context);
-        return sp.getLong(MUSIC, -1);
+        AlarmMusic alarmMusic = new AlarmMusic();
+        alarmMusic.restoreFromSharedPreferences(sp);
+        return alarmMusic;
     }
 
-    public static void setAlarmMusicId(Context context, long musicId) {
+    public static void saveAlarmMusic(Context context, AlarmMusic alarmMusic) {
         final SharedPreferences sp = getSharedPreferences(context);
-        final SharedPreferences.Editor editor = sp.edit();
-        editor.putLong(MUSIC, musicId);
-        editor.commit();
+        alarmMusic.saveToSharedPreferences(sp);
     }
 
     private static SharedPreferences getSharedPreferences(Context context) {

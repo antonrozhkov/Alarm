@@ -17,7 +17,7 @@
             android:theme="@style/AppTheme">
 
         <receiver
-                android:name=".ui.MyWidget"
+                android:name=".ui.AlarmWidget"
                 android:icon="@android:drawable/star_big_on"
                 android:label="@string/widget_name">
             <intent-filter>

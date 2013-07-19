@@ -7,48 +7,47 @@ import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
 import android.widget.TimePicker;
 
-import com.aurozhkov.alarm.utils.TimeUtils;
+import com.aurozhkov.alarm.beans.TimeItem;
 
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 
     public static interface OnTimeSelectedListener {
-        public void onTimeSelected(int[] time);
+        public void onTimeSelected(TimeItem time);
     }
 
     public static final String TIME_KEY = "time_key";
     private OnTimeSelectedListener mOnTimeSelectedListener;
-    private int mMinutes;
+    private TimeItem mTime;
 
-    public static TimePickerFragment getInstance(int minutes) {
+    public static TimePickerFragment getInstance(TimeItem time) {
         final TimePickerFragment tpf = new TimePickerFragment();
         final Bundle bundle = new Bundle();
-        bundle.putInt(TIME_KEY, minutes);
+        bundle.putParcelable(TIME_KEY, time);
         tpf.setArguments(bundle);
         return tpf;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final int[] time = initFromArguments(savedInstanceState == null ? getArguments() : savedInstanceState);
-        return new TimePickerDialog(getActivity(), this, time[0], time[1],
+        initFromArguments(savedInstanceState == null ? getArguments() : savedInstanceState);
+        return new TimePickerDialog(getActivity(), this, mTime.hours, mTime.minutes,
                 DateFormat.is24HourFormat(getActivity()));
     }
 
-    private int[] initFromArguments(Bundle bundle) {
-        mMinutes = bundle.getInt(TIME_KEY, 0);
-        return TimeUtils.hoursAndMinutesFromMinutes(mMinutes);
+    private void initFromArguments(Bundle bundle) {
+        mTime = bundle.getParcelable(TIME_KEY);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(TIME_KEY, mMinutes);
+        outState.putParcelable(TIME_KEY, mTime);
     }
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         if (mOnTimeSelectedListener != null) {
-            mOnTimeSelectedListener.onTimeSelected(new int[]{hourOfDay, minute});
+            mOnTimeSelectedListener.onTimeSelected(new TimeItem(hourOfDay, minute));
         }
     }
 

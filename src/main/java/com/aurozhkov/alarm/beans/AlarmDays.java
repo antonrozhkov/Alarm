@@ -1,6 +1,7 @@
 package com.aurozhkov.alarm.beans;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import java.util.BitSet;
 
@@ -30,12 +31,14 @@ public class AlarmDays {
         mAlarmDays = intToBitSet(daysCode);
     }
 
+    //1011001 -> 6320
     private static int bitSetToInt(BitSet value) {
         final int factor = 10;
         int result = 0;
         int currentDay = 0;
-        int currentFactor = 1;
+        int currentFactor;
         for (int i = 0; i < 7; i++) {
+            currentFactor = 1;
             if (value.get(i)) {
                 for (int j = 0; j < currentDay; j++) {
                     currentFactor *= factor;
@@ -44,9 +47,11 @@ public class AlarmDays {
                 result += currentFactor * i;
             }
         }
+        Log.d(AlarmDays.class.getSimpleName(), "bitSetToInt " + result + " : " + value.toString() + ":" + value.length());
         return result;
     }
 
+    //541 -> 0100110
     private static BitSet intToBitSet(int value) {
         BitSet result = new BitSet(7);
         int currentValue = value;
@@ -54,6 +59,7 @@ public class AlarmDays {
             result.set(currentValue % 10, true);
             currentValue /= 10;
         }
+        Log.d(AlarmDays.class.getSimpleName(), "intToBitSet " + value);
         return result;
     }
 }

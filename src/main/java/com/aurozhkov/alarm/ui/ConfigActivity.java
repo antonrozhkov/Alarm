@@ -2,12 +2,8 @@ package com.aurozhkov.alarm.ui;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
-import android.content.ContentUris;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.CheckBox;
@@ -15,11 +11,10 @@ import android.widget.TextView;
 
 import com.aurozhkov.alarm.R;
 import com.aurozhkov.alarm.beans.AlarmDays;
+import com.aurozhkov.alarm.beans.AlarmMusic;
 import com.aurozhkov.alarm.beans.AlarmTime;
+import com.aurozhkov.alarm.beans.TimeItem;
 import com.aurozhkov.alarm.utils.AlarmStorageUtils;
-import com.aurozhkov.alarm.utils.TimeUtils;
-
-import java.util.BitSet;
 
 public class ConfigActivity extends FragmentActivity implements View.OnClickListener {
 
@@ -28,75 +23,79 @@ public class ConfigActivity extends FragmentActivity implements View.OnClickList
 
     private int mWidgetID = AppWidgetManager.INVALID_APPWIDGET_ID;
     private Intent mResultValue;
+    private AlarmMusic mAlarmMusic;
+    private AlarmTime mAlarmTime;
+    private AlarmDays mAlarmDays;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final Intent intent = getIntent();
-        final Bundle extras = intent.getExtras();
-        if (extras != null) {
-            mWidgetID = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                    AppWidgetManager.INVALID_APPWIDGET_ID);
-        }
-
-        if (mWidgetID == AppWidgetManager.INVALID_APPWIDGET_ID) {
-            finish();
-        }
-
-        mResultValue = new Intent();
-        mResultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mWidgetID);
-
-        setResult(RESULT_CANCELED, mResultValue);
+        checkWidgetId();
+        formResult();
 
         setContentView(R.layout.activity_config);
 
+        initBeans();
         initViews();
     }
 
+    private void formResult() {
+        mResultValue = new Intent();
+        mResultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mWidgetID);
+        setResult(RESULT_CANCELED, mResultValue);
+    }
+
+    private void checkWidgetId() {
+        final Intent intent = getIntent();
+        final Bundle extras = intent.getExtras();
+        if (extras != null) {
+            mWidgetID = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        }
+        if (mWidgetID == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            finish();
+        }
+    }
+
+    private void initBeans() {
+        mAlarmMusic = AlarmStorageUtils.getAlarmMusic(this);
+        mAlarmTime = AlarmStorageUtils.getAlarmTime(this);
+        mAlarmDays = AlarmStorageUtils.getAlarmDays(this);
+    }
+
     private void initViews() {
-        findViewById(R.id.ok).setOnClickListener(this);
-        findViewById(R.id.time).setOnClickListener(this);
-        findViewById(R.id.music).setOnClickListener(this);
+        initClickableViews();
 
         initTime();
         initDays();
         initMusic();
     }
 
+    private void initClickableViews() {
+        findViewById(R.id.ok).setOnClickListener(this);
+        findViewById(R.id.time).setOnClickListener(this);
+        findViewById(R.id.music).setOnClickListener(this);
+    }
+
     private void initTime() {
-        final AlarmTime alarmTime = AlarmStorageUtils.getAlarmTime(this);
         final TextView tv = (TextView) findViewById(R.id.time);
-        tv.setText(alarmTime.toString());
+        tv.setText(mAlarmTime.getTimeString());
     }
 
     private void initDays() {
-        final AlarmDays alarmDays = AlarmStorageUtils.getAlarmDays(this);
         int day = 0;
-        ((CheckBox) findViewById(R.id.monday)).setChecked(alarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.tuesday)).setChecked(alarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.wednesday)).setChecked(alarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.thursday)).setChecked(alarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.friday)).setChecked(alarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.saturday)).setChecked(alarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.sunday)).setChecked(alarmDays.isSelected(day));
+        ((CheckBox) findViewById(R.id.monday)).setChecked(mAlarmDays.isSelected(day++));
+        ((CheckBox) findViewById(R.id.tuesday)).setChecked(mAlarmDays.isSelected(day++));
+        ((CheckBox) findViewById(R.id.wednesday)).setChecked(mAlarmDays.isSelected(day++));
+        ((CheckBox) findViewById(R.id.thursday)).setChecked(mAlarmDays.isSelected(day++));
+        ((CheckBox) findViewById(R.id.friday)).setChecked(mAlarmDays.isSelected(day++));
+        ((CheckBox) findViewById(R.id.saturday)).setChecked(mAlarmDays.isSelected(day++));
+        ((CheckBox) findViewById(R.id.sunday)).setChecked(mAlarmDays.isSelected(day));
     }
 
     private void initMusic() {
-        final long musicId = AlarmStorageUtils.getAlarmMusicId(this);
-        if (musicId != -1) {
-            final Uri uri = ContentUris.withAppendedId(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, musicId);
-            final TextView tv = (TextView) findViewById(R.id.music);
-            tv.setText(getFilenameFromURI(uri));
-        }
-    }
-
-    private String getFilenameFromURI(Uri contentUri) {
-        String[] proj = {MediaStore.Audio.Media.DISPLAY_NAME};
-        Cursor cursor = managedQuery(contentUri, proj, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
+        final TextView tv = (TextView) findViewById(R.id.music);
+        tv.setText(mAlarmMusic.getFileName(this));
     }
 
 
@@ -116,30 +115,46 @@ public class ConfigActivity extends FragmentActivity implements View.OnClickList
     }
 
     private void saveResult() {
-        final AlarmDays alarmDays = getAlarmsDays();
-        AlarmStorageUtils.saveAlarmDays(this, alarmDays);
-
-        final AlarmTime alarmTime = getAlarmTime();
-        AlarmStorageUtils.setAlarmTime(this, alarmTime);
-
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-        MyWidget.updateWidget(this, appWidgetManager, mWidgetID);
-
+        saveBeans();
+        updateWidget();
         setResult(RESULT_OK, mResultValue);
         finish();
     }
 
+    private void saveBeans() {
+        getAlarmsDays();
+        AlarmStorageUtils.saveAlarmDays(this, mAlarmDays);
+        AlarmStorageUtils.saveAlarmMusic(this, mAlarmMusic);
+        AlarmStorageUtils.saveAlarmTime(this, mAlarmTime);
+    }
+
+    private void updateWidget() {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        AlarmWidget.updateWidget(this, appWidgetManager, mWidgetID);
+    }
+
+    private void getAlarmsDays() {
+        int day = 0;
+        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.monday)).isChecked());
+        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.tuesday)).isChecked());
+        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.wednesday)).isChecked());
+        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.thursday)).isChecked());
+        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.friday)).isChecked());
+        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.saturday)).isChecked());
+        mAlarmDays.select(day, ((CheckBox) findViewById(R.id.sunday)).isChecked());
+    }
+
     private void selectTime() {
-        final TextView tvTime = (TextView) findViewById(R.id.time);
-        final String time = tvTime.getText().toString();
-        final TimePickerFragment tpf = TimePickerFragment.getInstance(TimeUtils.minutesFromTimeString(time));
+        final TimePickerFragment tpf = TimePickerFragment.getInstance(mAlarmTime.getTime());
         tpf.setOnTimeSelectedListener(new TimePickerFragment.OnTimeSelectedListener() {
             @Override
-            public void onTimeSelected(int[] time) {
-                tvTime.setText(TimeUtils.timeStringFromTime(time));
+            public void onTimeSelected(TimeItem time) {
+                mAlarmTime.update(time);
+                initTime();
             }
         });
         tpf.show(getSupportFragmentManager(), "Time");
+
     }
 
     private void selectMusic() {
@@ -150,31 +165,11 @@ public class ConfigActivity extends FragmentActivity implements View.OnClickList
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_MUSIC_CODE && resultCode == Activity.RESULT_OK) {
-            AlarmStorageUtils.setAlarmMusicId(this, ContentUris.parseId(data.getData()));
+            mAlarmMusic.update(data.getData());
             initMusic();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    private AlarmDays getAlarmsDays() {
-        final AlarmDays alarmDays = new AlarmDays();
-        int day = 0;
-        alarmDays.select(day++, ((CheckBox) findViewById(R.id.monday)).isChecked());
-        alarmDays.select(day++, ((CheckBox) findViewById(R.id.tuesday)).isChecked());
-        alarmDays.select(day++, ((CheckBox) findViewById(R.id.wednesday)).isChecked());
-        alarmDays.select(day++, ((CheckBox) findViewById(R.id.thursday)).isChecked());
-        alarmDays.select(day++, ((CheckBox) findViewById(R.id.friday)).isChecked());
-        alarmDays.select(day++, ((CheckBox) findViewById(R.id.saturday)).isChecked());
-        alarmDays.select(day, ((CheckBox) findViewById(R.id.sunday)).isChecked());
-        return alarmDays;
-    }
-
-    private AlarmTime getAlarmTime() {
-        final TextView tvTime = (TextView) findViewById(R.id.time);
-        final String time = tvTime.getText().toString();
-        AlarmTime alarmTime = new AlarmTime();
-        alarmTime.fromString(time);
-        return alarmTime;
-    }
 }
