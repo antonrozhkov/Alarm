@@ -38,6 +38,8 @@ public class ConfigActivity extends FragmentActivity implements View.OnClickList
 
         initBeans();
         initViews();
+
+
     }
 
     private void formResult() {

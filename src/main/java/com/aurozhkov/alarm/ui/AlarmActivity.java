@@ -9,6 +9,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 
@@ -34,19 +35,14 @@ public class AlarmActivity extends Activity implements View.OnClickListener {
 
         initManagers();
         initViews();
-
-        isScreenWasOff = isScreenWasOff();
-
-        if (isScreenWasOff) {
-            wakeDevice();
-        }
+        initScreen();
 
         startMusic();
     }
 
     private void initManagers() {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "WakeLock");
+        wakeLock = pm.newWakeLock((PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "WakeLock");
 
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         keyguardLock = keyguardManager.newKeyguardLock("KeyguardLock");
@@ -54,6 +50,13 @@ public class AlarmActivity extends Activity implements View.OnClickListener {
 
     private void initViews() {
         findViewById(R.id.ok).setOnClickListener(this);
+    }
+
+    private void initScreen() {
+        isScreenWasOff = isScreenWasOff();
+        if (isScreenWasOff) {
+            wakeDevice();
+        }
     }
 
     private boolean isScreenWasOff() {
@@ -69,16 +72,20 @@ public class AlarmActivity extends Activity implements View.OnClickListener {
     private void startMusic()  {
         final AlarmMusic alarmMusic = AlarmStorageUtils.getAlarmMusic(this);
         if (alarmMusic.hasMusicFile()) {
-            final Uri uri = ContentUris.withAppendedId(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, alarmMusic.getMusicFileId());
-            try {
-                preparePlayer(uri);
-            } catch (IOException e) {
-                preparePlayerWithDefaultMusic(alarmMusic);
-            }
+            prepareWithMusicFile(alarmMusic);
         } else {
             preparePlayerWithDefaultMusic(alarmMusic);
         }
         mediaPlayer.start();
+    }
+
+    private void prepareWithMusicFile(AlarmMusic alarmMusic) {
+        final Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, alarmMusic.getMusicFileId());
+        try {
+            preparePlayer(uri);
+        } catch (IOException e) {
+            preparePlayerWithDefaultMusic(alarmMusic);
+        }
     }
 
     private void preparePlayer(Uri uri) throws IOException {
@@ -109,7 +116,7 @@ public class AlarmActivity extends Activity implements View.OnClickListener {
                 mediaPlayer.release();
                 mediaPlayer = null;
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.d(TAG, e.toString());
             }
         }
     }

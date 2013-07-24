@@ -26,6 +26,10 @@ public class AlarmDays {
         editor.commit();
     }
 
+    public boolean isEmpty() {
+        return mAlarmDays.isEmpty();
+    }
+
     public void restoreFromSharedPreferences(SharedPreferences sp) {
         final int daysCode = sp.getInt(PREF_KEY, 0);
         mAlarmDays = intToBitSet(daysCode);
@@ -47,7 +51,6 @@ public class AlarmDays {
                 result += currentFactor * i;
             }
         }
-        Log.d(AlarmDays.class.getSimpleName(), "bitSetToInt " + result + " : " + value.toString() + ":" + value.length());
         return result;
     }
 
@@ -59,7 +62,6 @@ public class AlarmDays {
             result.set(currentValue % 10, true);
             currentValue /= 10;
         }
-        Log.d(AlarmDays.class.getSimpleName(), "intToBitSet " + value);
         return result;
     }
 }
