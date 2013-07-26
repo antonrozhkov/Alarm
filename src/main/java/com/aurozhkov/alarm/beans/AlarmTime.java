@@ -19,16 +19,18 @@ public class AlarmTime {
         editor.commit();
     }
 
-    public void restoreFromSharedPreferences(SharedPreferences sp) {
+    public static AlarmTime restoreFromSharedPreferences(SharedPreferences sp) {
+        final AlarmTime alarmTime = new AlarmTime();
         final int timeCode = sp.getInt(PREF_KEY, 0);
-        mTime = TimeItem.fromInt(timeCode);
+        alarmTime.mTime = TimeItem.fromInt(timeCode);
+        return alarmTime;
     }
 
     public String getTimeString() {
         return String.format("%s:%s",formatTimePart(mTime.hours),formatTimePart(mTime.minutes));
     }
 
-    private static String formatTimePart(int part) {
+    private String formatTimePart(int part) {
         if (part < 10) {
             return "0" + part;
         } else {

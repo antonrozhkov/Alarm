@@ -2,7 +2,6 @@ package com.aurozhkov.alarm.beans;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 public class TimeItem implements Parcelable {
     public final int minutes;

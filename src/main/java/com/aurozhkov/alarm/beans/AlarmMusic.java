@@ -34,8 +34,10 @@ public class AlarmMusic {
         editor.commit();
     }
 
-    public void restoreFromSharedPreferences(SharedPreferences sp) {
-        mMusicFileId = sp.getLong(PREF_KEY, INVALID_FILE_MUSIC_ID);
+    public static AlarmMusic restoreFromSharedPreferences(SharedPreferences sp) {
+        final AlarmMusic alarmMusic = new AlarmMusic();
+        alarmMusic.mMusicFileId = sp.getLong(PREF_KEY, INVALID_FILE_MUSIC_ID);
+        return alarmMusic;
     }
 
     public void update(Uri fileMusicUri) {

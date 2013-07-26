@@ -1,25 +1,20 @@
-package com.aurozhkov.alarm.utils;
+package com.aurozhkov.alarm.app;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.aurozhkov.alarm.R;
 import com.aurozhkov.alarm.beans.AlarmDays;
 import com.aurozhkov.alarm.beans.AlarmMusic;
 import com.aurozhkov.alarm.beans.AlarmTime;
 
-import java.util.BitSet;
-
-public class AlarmStorageUtils {
+public class AlarmStorage {
 
     private static final String ON = "on";
     private final static String PREF = "pref";
 
     public static AlarmDays getAlarmDays(Context context) {
         final SharedPreferences sp = getSharedPreferences(context);
-        AlarmDays alarmDays = new AlarmDays();
-        alarmDays.restoreFromSharedPreferences(sp);
-        return alarmDays;
+        return AlarmDays.restoreFromSharedPreferences(sp);
     }
 
     public static void saveAlarmDays(Context context, AlarmDays alarmDays) {
@@ -29,9 +24,7 @@ public class AlarmStorageUtils {
 
     public static AlarmTime getAlarmTime(Context context) {
         final SharedPreferences sp = getSharedPreferences(context);
-        AlarmTime alarmTime = new AlarmTime();
-        alarmTime.restoreFromSharedPreferences(sp);
-        return alarmTime;
+        return AlarmTime.restoreFromSharedPreferences(sp);
     }
 
     public static void saveAlarmTime(Context context, AlarmTime time) {
@@ -53,9 +46,7 @@ public class AlarmStorageUtils {
 
     public static AlarmMusic getAlarmMusic(Context context) {
         final SharedPreferences sp = getSharedPreferences(context);
-        AlarmMusic alarmMusic = new AlarmMusic();
-        alarmMusic.restoreFromSharedPreferences(sp);
-        return alarmMusic;
+        return AlarmMusic.restoreFromSharedPreferences(sp);
     }
 
     public static void saveAlarmMusic(Context context, AlarmMusic alarmMusic) {
@@ -67,7 +58,7 @@ public class AlarmStorageUtils {
         return context.getSharedPreferences(PREF, Context.MODE_PRIVATE);
     }
 
-    private AlarmStorageUtils() {
+    private AlarmStorage() {
 
     }
 }

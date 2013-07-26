@@ -15,7 +15,7 @@ import android.view.View;
 
 import com.aurozhkov.alarm.R;
 import com.aurozhkov.alarm.beans.AlarmMusic;
-import com.aurozhkov.alarm.utils.AlarmStorageUtils;
+import com.aurozhkov.alarm.app.AlarmStorage;
 
 import java.io.IOException;
 
@@ -70,7 +70,7 @@ public class AlarmActivity extends Activity implements View.OnClickListener {
     }
 
     private void startMusic()  {
-        final AlarmMusic alarmMusic = AlarmStorageUtils.getAlarmMusic(this);
+        final AlarmMusic alarmMusic = AlarmStorage.getAlarmMusic(this);
         if (alarmMusic.hasMusicFile()) {
             prepareWithMusicFile(alarmMusic);
         } else {

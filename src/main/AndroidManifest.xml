@@ -34,7 +34,7 @@
         <receiver  android:process=":remote" android:name=".broadcast.Alarm"/>
 
         <activity
-                android:name=".ui.ConfigActivity">
+                android:name="com.aurozhkov.alarm.ui.ConfigActivity">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>

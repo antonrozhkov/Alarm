@@ -1,11 +1,12 @@
-package com.aurozhkov.alarm.utils;
+package com.aurozhkov.alarm.app;
 
 import com.aurozhkov.alarm.beans.AlarmDays;
 import com.aurozhkov.alarm.beans.AlarmTime;
+import com.aurozhkov.alarm.utils.TimeUtils;
 
 import java.util.Calendar;
 
-public class AlarmCalculateUtils {
+public class AlarmTimeCalculator {
 
     public static int getSecondsToNextAlarm(AlarmDays alarmDays, AlarmTime alarmTime) {
         if (alarmDays.isEmpty()) {
@@ -61,7 +62,7 @@ public class AlarmCalculateUtils {
         return seconds;
     }
 
-    private AlarmCalculateUtils() {
+    private AlarmTimeCalculator() {
 
     }
 }

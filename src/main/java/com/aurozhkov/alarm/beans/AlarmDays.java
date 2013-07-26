@@ -1,7 +1,6 @@
 package com.aurozhkov.alarm.beans;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import java.util.BitSet;
 
@@ -30,33 +29,37 @@ public class AlarmDays {
         return mAlarmDays.isEmpty();
     }
 
-    public void restoreFromSharedPreferences(SharedPreferences sp) {
+    public static AlarmDays restoreFromSharedPreferences(SharedPreferences sp) {
+        final AlarmDays alarmDays = new AlarmDays();
         final int daysCode = sp.getInt(PREF_KEY, 0);
-        mAlarmDays = intToBitSet(daysCode);
+        alarmDays.mAlarmDays = intToBitSet(daysCode);
+        return alarmDays;
     }
 
     //1011001 -> 6320
     private static int bitSetToInt(BitSet value) {
-        final int factor = 10;
         int result = 0;
         int currentDay = 0;
-        int currentFactor;
         for (int i = 0; i < 7; i++) {
-            currentFactor = 1;
             if (value.get(i)) {
-                for (int j = 0; j < currentDay; j++) {
-                    currentFactor *= factor;
-                }
-                currentDay++;
-                result += currentFactor * i;
+                result += getCurrentFactor(currentDay++) * i;
             }
         }
         return result;
     }
 
+    private static int getCurrentFactor(int currentDay) {
+        final int factor = 10;
+        int currentFactor = 1;
+        for (int j = 0; j < currentDay; j++) {
+            currentFactor *= factor;
+        }
+        return currentFactor;
+    }
+
     //541 -> 0100110
     private static BitSet intToBitSet(int value) {
-        BitSet result = new BitSet(7);
+        final BitSet result = new BitSet(7);
         int currentValue = value;
         while (currentValue != 0) {
             result.set(currentValue % 10, true);

@@ -10,11 +10,12 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.aurozhkov.alarm.R;
+import com.aurozhkov.alarm.utils.ArrayViewMatcher;
 import com.aurozhkov.alarm.beans.AlarmDays;
 import com.aurozhkov.alarm.beans.AlarmMusic;
 import com.aurozhkov.alarm.beans.AlarmTime;
 import com.aurozhkov.alarm.beans.TimeItem;
-import com.aurozhkov.alarm.utils.AlarmStorageUtils;
+import com.aurozhkov.alarm.app.AlarmStorage;
 
 public class ConfigActivity extends FragmentActivity implements View.OnClickListener {
 
@@ -38,8 +39,6 @@ public class ConfigActivity extends FragmentActivity implements View.OnClickList
 
         initBeans();
         initViews();
-
-
     }
 
     private void formResult() {
@@ -60,9 +59,9 @@ public class ConfigActivity extends FragmentActivity implements View.OnClickList
     }
 
     private void initBeans() {
-        mAlarmMusic = AlarmStorageUtils.getAlarmMusic(this);
-        mAlarmTime = AlarmStorageUtils.getAlarmTime(this);
-        mAlarmDays = AlarmStorageUtils.getAlarmDays(this);
+        mAlarmMusic = AlarmStorage.getAlarmMusic(this);
+        mAlarmTime = AlarmStorage.getAlarmTime(this);
+        mAlarmDays = AlarmStorage.getAlarmDays(this);
     }
 
     private void initViews() {
@@ -85,21 +84,16 @@ public class ConfigActivity extends FragmentActivity implements View.OnClickList
     }
 
     private void initDays() {
-        int day = 0;
-        ((CheckBox) findViewById(R.id.monday)).setChecked(mAlarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.tuesday)).setChecked(mAlarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.wednesday)).setChecked(mAlarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.thursday)).setChecked(mAlarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.friday)).setChecked(mAlarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.saturday)).setChecked(mAlarmDays.isSelected(day++));
-        ((CheckBox) findViewById(R.id.sunday)).setChecked(mAlarmDays.isSelected(day));
+        final ArrayViewMatcher arrayViewMatcher = new ArrayViewMatcher(this, R.array.days_array);
+        for (int i = 0; i < arrayViewMatcher.getLength(); i++) {
+            ((CheckBox) arrayViewMatcher.getView(this, i)).setChecked(mAlarmDays.isSelected(i));
+        }
     }
 
     private void initMusic() {
         final TextView tv = (TextView) findViewById(R.id.music);
         tv.setText(mAlarmMusic.getFileName(this));
     }
-
 
     @Override
     public void onClick(View v) {
@@ -125,25 +119,20 @@ public class ConfigActivity extends FragmentActivity implements View.OnClickList
 
     private void saveBeans() {
         getAlarmsDays();
-        AlarmStorageUtils.saveAlarmDays(this, mAlarmDays);
-        AlarmStorageUtils.saveAlarmMusic(this, mAlarmMusic);
-        AlarmStorageUtils.saveAlarmTime(this, mAlarmTime);
+        AlarmStorage.saveAlarmDays(this, mAlarmDays);
+        AlarmStorage.saveAlarmMusic(this, mAlarmMusic);
+        AlarmStorage.saveAlarmTime(this, mAlarmTime);
     }
 
     private void updateWidget() {
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-        AlarmWidget.updateWidget(this, appWidgetManager, mWidgetID);
+        AlarmWidget.updateWidget(this, mWidgetID);
     }
 
     private void getAlarmsDays() {
-        int day = 0;
-        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.monday)).isChecked());
-        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.tuesday)).isChecked());
-        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.wednesday)).isChecked());
-        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.thursday)).isChecked());
-        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.friday)).isChecked());
-        mAlarmDays.select(day++, ((CheckBox) findViewById(R.id.saturday)).isChecked());
-        mAlarmDays.select(day, ((CheckBox) findViewById(R.id.sunday)).isChecked());
+        final ArrayViewMatcher arrayViewMatcher = new ArrayViewMatcher(this, R.array.days_array);
+        for (int i = 0; i < arrayViewMatcher.getLength(); i++) {
+            mAlarmDays.select(i, ((CheckBox) arrayViewMatcher.getView(this, i)).isChecked());
+        }
     }
 
     private void selectTime() {

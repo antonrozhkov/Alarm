@@ -13,7 +13,8 @@ import com.aurozhkov.alarm.beans.AlarmDays;
 import com.aurozhkov.alarm.beans.AlarmTime;
 import com.aurozhkov.alarm.broadcast.Alarm;
 import com.aurozhkov.alarm.R;
-import com.aurozhkov.alarm.utils.AlarmStorageUtils;
+import com.aurozhkov.alarm.app.AlarmStorage;
+import com.aurozhkov.alarm.utils.ArrayViewMatcher;
 
 public class AlarmWidget extends AppWidgetProvider {
 
@@ -34,7 +35,7 @@ public class AlarmWidget extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
         for (int id : appWidgetIds) {
-            updateWidget(context, appWidgetManager, id);
+            updateWidget(context, id);
         }
     }
 
@@ -56,7 +57,7 @@ public class AlarmWidget extends AppWidgetProvider {
             final int mAppWidgetId = getWidgetId(intent);
             if(isValidWidgetId(mAppWidgetId)) {
                 changeOnOff(context);
-                updateWidget(context, AppWidgetManager.getInstance(context), mAppWidgetId);
+                updateWidget(context, mAppWidgetId);
             }
         }
     }
@@ -79,16 +80,16 @@ public class AlarmWidget extends AppWidgetProvider {
     }
 
     private void changeOnOff(Context context) {
-        final boolean on = AlarmStorageUtils.getAlarmOn(context);
+        final boolean on = AlarmStorage.getAlarmOn(context);
         if(on) {
             mAlarm.cancelAlarm(context);
         } else {
             mAlarm.setAlarm(context);
         }
-        AlarmStorageUtils.saveAlarmOn(context, !on);
+        AlarmStorage.saveAlarmOn(context, !on);
     }
 
-    public static void updateWidget(Context context, AppWidgetManager appWidgetManager, int widgetID) {
+    public static void updateWidget(Context context, int widgetID) {
         final RemoteViews updatedWidgetView = getUpdatedWidgetView(context);
         final PendingIntent openConfigIntent = getOpenConfigIntent(context, widgetID);
         updatedWidgetView.setOnClickPendingIntent(R.id.alarm_container, openConfigIntent);
@@ -96,6 +97,7 @@ public class AlarmWidget extends AppWidgetProvider {
         final PendingIntent onOffIntent = getOnOffIntent(context, widgetID);
         updatedWidgetView.setOnClickPendingIntent(R.id.on, onOffIntent);
 
+        final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         appWidgetManager.updateAppWidget(widgetID, updatedWidgetView);
     }
 
@@ -108,38 +110,27 @@ public class AlarmWidget extends AppWidgetProvider {
     }
 
     private static void updateOnOff(RemoteViews widgetView, Context context) {
-        final boolean on = AlarmStorageUtils.getAlarmOn(context);
+        final boolean on = AlarmStorage.getAlarmOn(context);
         final int buttonId = R.id.on;
         final int drawableForButtonId = on ? R.drawable.on : R.drawable.off;
         widgetView.setInt(buttonId, "setImageResource", drawableForButtonId);
     }
 
     private static void updateTime(RemoteViews widgetView, Context context) {
-        final AlarmTime alarmTime = AlarmStorageUtils.getAlarmTime(context);
+        final AlarmTime alarmTime = AlarmStorage.getAlarmTime(context);
         widgetView.setTextViewText(R.id.time, alarmTime.getTimeString());
     }
 
     private static void updateDays(RemoteViews widgetView, Context context) {
-        final AlarmDays alarmDays = AlarmStorageUtils.getAlarmDays(context);
-
-        int day = 0;
-        updateWidgetForDay(widgetView, R.id.monday, alarmDays.isSelected(day++));
-        updateWidgetForDay(widgetView, R.id.tuesday, alarmDays.isSelected(day++));
-        updateWidgetForDay(widgetView, R.id.wednesday, alarmDays.isSelected(day++));
-        updateWidgetForDay(widgetView, R.id.thursday, alarmDays.isSelected(day++));
-        updateWidgetForDay(widgetView, R.id.friday, alarmDays.isSelected(day++));
-        updateWidgetForDay(widgetView, R.id.saturday, alarmDays.isSelected(day++));
-        updateWidgetForDay(widgetView, R.id.sunday, alarmDays.isSelected(day));
+        final AlarmDays alarmDays = AlarmStorage.getAlarmDays(context);
+        ArrayViewMatcher arrayViewMatcher = new ArrayViewMatcher(context, R.array.days_array);
+        for(int i=0; i<arrayViewMatcher.getLength(); i++) {
+            updateWidgetForDay(widgetView, arrayViewMatcher.getViewId(i), alarmDays.isSelected(i));
+        }
     }
 
     private static void updateWidgetForDay(RemoteViews widgetView, int id, boolean isSelected) {
-        int color;
-        if (isSelected) {
-            color = SELECTED_COLOR;
-        } else {
-            color = NOT_SELECTED_COLOR;
-        }
-        widgetView.setInt(id, "setTextColor", color);
+        widgetView.setInt(id, "setTextColor", isSelected ? SELECTED_COLOR : NOT_SELECTED_COLOR);
     }
 
     private static PendingIntent getOpenConfigIntent(Context context, int widgetID) {
